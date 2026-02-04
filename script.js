@@ -4,6 +4,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const background = document.getElementById('background');
     const proposalText = document.getElementById('proposal-text');
     const buttonGroup = document.getElementById('button-group');
+    const bgMusic = document.getElementById('bgm');
+
+    // Fade in audio helper
+    function fadeInAudio(audio, duration = 3000) {
+        audio.volume = 0;
+
+        const start = performance.now();
+        const tick = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            audio.volume = progress * 0.2;
+            if (progress < 1) {
+                requestAnimationFrame(tick);
+            }
+        };
+        requestAnimationFrame(tick);
+    }
 
     // Floating hearts creation
     let currentEmoji = '❤️';
@@ -132,6 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
             raindrops.forEach(drop => drop.remove());
         }
 
+        // --- Start/Replay Music with Fade-in (0.5s delay) ---
+        if (bgMusic) {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            bgMusic.volume = 0;
+            bgMusic.play().catch(e => console.log("Music play blocked by browser:", e));
+
+            setTimeout(() => {
+                fadeInAudio(bgMusic, 3500);
+            }, 500);
+        }
+
         // Change image to success GIF
         const mainImg = document.querySelector('.main-image');
         if (mainImg) {
@@ -151,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Change text and state
-        proposalText.innerText = "YAYY!! i love you too";
+        proposalText.innerText = "YAYY!! I love you so much! 💖";
         proposalText.classList.add('success-text');
         document.body.classList.add('success-bg');
 
@@ -178,5 +207,120 @@ document.addEventListener('DOMContentLoaded', () => {
             confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
             confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
         }, 250);
+
+        // --- Letter Teaser Transition ---
+        setTimeout(() => {
+            // Keep both: Success bear and letter surprise
+            const letterSticker = document.getElementById('letter-sticker');
+            const mainImg = document.getElementById('main-image');
+
+            letterSticker.src = "https://media.tenor.com/r2mSqYQUKycAAAAi/raf-rafs.gif";
+            letterSticker.classList.remove('hidden');
+
+            proposalText.style.opacity = '0';
+            setTimeout(() => {
+                proposalText.innerText = "oh wait.. seems like a letter for you";
+                proposalText.style.opacity = '1';
+                showEnvelope();
+            }, 500);
+        }, 2000);
     });
+
+    function showEnvelope() {
+        const letterContainer = document.getElementById('letter-container');
+        const explorerPage = document.getElementById('explorer-page');
+        const letterSticker = document.getElementById('letter-sticker');
+        const explorerHeartBtn = document.getElementById('explorer-heart-btn');
+        const closeBtn = document.getElementById('close-letter');
+        const proposalText = document.getElementById('proposal-text');
+        const explorerCard = document.querySelector('.explorer-card');
+        const explorerMainText = document.querySelector('.explorer-main-text');
+        const explorerSubText = document.querySelector('.explorer-sub-text');
+
+        let currentStageIndex = 0;
+        // bgMusic is globally available
+
+        const explorerStages = [
+            { mainText: "Still Here? Awesome! ✨", subText: "The journey is just beginning... click the heart! ❤️" },
+            { mainText: "Every moment is a gift", subText: "I'm so lucky to have you in my life, making everything special. 🌹" },
+            { mainText: "You're my favorite thought", subText: "Whenever I'm bored, I just start thinking about you and smile. 😊" },
+            { mainText: "Through thick and thin...", subText: "No matter what happens, I'm always going to be by your side. 🤝" },
+            { mainText: "You add color to my world", subText: "Everything seems brighter and happier when you're around. 🌈" },
+            { mainText: "Just a reminder...", subText: "You are truly one of a kind and loved more than you know. 🧸" },
+            { mainText: "One last thing!", subText: "I have a tiny surprise waiting for you right here... ❤️" }
+        ];
+
+        const openExplorer = () => {
+            if (explorerPage.classList.contains('hidden')) {
+                // Always start from the beginning
+                currentStageIndex = 0;
+                explorerMainText.innerText = explorerStages[0].mainText;
+                explorerSubText.innerText = explorerStages[0].subText;
+                explorerCard.style.opacity = '1';
+
+                explorerPage.classList.remove('hidden');
+                letterSticker.classList.add('shrunk-corner');
+                proposalText.style.opacity = '0';
+                setTimeout(() => {
+                    explorerPage.style.opacity = '1';
+                }, 10);
+            }
+        };
+
+        const updateExplorerContent = () => {
+            currentStageIndex++;
+            if (currentStageIndex < explorerStages.length) {
+                // Smooth transition between stages
+                explorerCard.style.opacity = '0';
+                setTimeout(() => {
+                    explorerMainText.innerText = explorerStages[currentStageIndex].mainText;
+                    explorerSubText.innerText = explorerStages[currentStageIndex].subText;
+                    explorerCard.style.opacity = '1';
+                }, 400);
+            } else {
+                openLetter();
+            }
+        };
+
+        const openLetter = () => {
+            letterContainer.classList.remove('hidden');
+            setTimeout(() => {
+                letterContainer.style.opacity = '1';
+                explorerPage.style.opacity = '0';
+                setTimeout(() => explorerPage.classList.add('hidden'), 500);
+            }, 10);
+
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff4d6d', '#ff8fa3', '#ffffff']
+            });
+        };
+
+        const closeExplorer = () => {
+            explorerPage.style.opacity = '0';
+            letterSticker.classList.add('shrunk-corner');
+            proposalText.innerText = "YAYY!! yay i love you so muchh 💖";
+            proposalText.style.opacity = '1';
+            setTimeout(() => {
+                explorerPage.classList.add('hidden');
+            }, 500);
+        };
+
+        const closeLetter = () => {
+            letterContainer.style.opacity = '0';
+            letterSticker.classList.add('shrunk-corner');
+            proposalText.innerText = "YAYY!! yay i love you so muchh 💖";
+            proposalText.style.opacity = '1';
+            setTimeout(() => {
+                letterContainer.classList.add('hidden');
+            }, 500);
+        };
+
+        letterSticker.addEventListener('click', openExplorer);
+        explorerHeartBtn.addEventListener('click', updateExplorerContent);
+        closeBtn.addEventListener('click', closeLetter);
+        document.getElementById('close-explorer').addEventListener('click', closeExplorer);
+    }
 });
