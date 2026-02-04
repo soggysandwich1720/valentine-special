@@ -161,7 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     // Interaction happened, audio started successfully
-                    fadeInAudio(bgMusic, 3500);
+                    // Restore the 500ms delay for smooth transition as requested
+                    setTimeout(() => {
+                        fadeInAudio(bgMusic, 3500);
+                    }, 500);
                 }).catch(e => {
                     console.log("Music play blocked by browser:", e);
                     // On some browsers, we might need another interaction or a fallback
