@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Dancing+Script:wght@400;700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -19,7 +21,8 @@
     <main class="content" id="main-content">
         <div class="image-container">
             <img src="https://media1.tenor.com/m/K_E6ORTmXMoAAAAC/milk-and-mocha-love.gif" alt="Cute Milk and Mocha"
-                class="main-image">
+                class="main-image" id="main-image">
+            <img src="" alt="Letter surprise" class="letter-sticker hidden" id="letter-sticker">
         </div>
         <h1 class="proposal-text" id="proposal-text">Will you be my Valentine?</h1>
         <div class="button-group" id="button-group">
@@ -28,9 +31,52 @@
         </div>
     </main>
 
+    <div id="explorer-page" class="explorer-page hidden">
+        <button class="close-explorer" id="close-explorer">&times;</button>
+        <div class="explorer-card">
+            <span class="quote-icon">&ldquo;</span>
+            <p class="explorer-main-text">Hey Are You There?</p>
+            <p class="explorer-sub-text">Click On The Heart Sign To Explore More</p>
+        </div>
+        <button id="explorer-heart-btn" class="explorer-heart-btn">
+            <span class="heart-icon">❤️</span>
+        </button>
+    </div>
+
+    <div id="letter-container" class="letter-container hidden">
+        <div class="letter">
+            <button class="close-letter" id="close-letter">&times;</button>
+            <div class="letter-content">
+                <h2 class="letter-header">To you, my love</h2>
+                <div class="letter-text">
+                    <p>I wanted to take a moment to express what you mean to me. Sometimes, in the midst of
+                        daily routines, it's easy to forget to say out loud the important things. So here I am,
+                        trying to put into words what I feel.</p>
+                    <p>Since you entered my life, you have been a constant source of joy and support. Your
+                        laughter, your encouraging words, and your presence always fill me with tranquility. I
+                        love how we share our days, from the small things to the big dreams.</p>
+                    <p>I admire your strength and your passion for what you do. You inspire me to be a better
+                        person and to face challenges with a smile. Knowing that I have someone like you by my
+                        side makes everything seem more manageable and more meaningful.</p>
+                    <p>I want you to know that I am here for you, through the good times and the bad. I cherish
+                        every moment we share and look forward to all the ones to come. Thank you for being you,
+                        for all that you are.</p>
+                    <p>Forever and always, my heart belongs to you.</p>
+                </div>
+                <div class="letter-footer">
+                    <p>With all my love,</p>
+                    <p class="signature">rinxuu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">made by rinxuu 😋</footer>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
+    <audio id="bgm" loop preload="auto">
+        <source src="./bgm.mp3" type="audio/mpeg">
+    </audio>
 </body>
 
 </html>

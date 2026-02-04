@@ -149,16 +149,25 @@ document.addEventListener('DOMContentLoaded', () => {
             raindrops.forEach(drop => drop.remove());
         }
 
-        // --- Start/Replay Music with Fade-in (0.5s delay) ---
+        // --- Start/Replay Music with Fade-in ---
         if (bgMusic) {
             bgMusic.pause();
             bgMusic.currentTime = 0;
             bgMusic.volume = 0;
-            bgMusic.play().catch(e => console.log("Music play blocked by browser:", e));
 
-            setTimeout(() => {
-                fadeInAudio(bgMusic, 3500);
-            }, 500);
+            // Try to play immediately
+            const playPromise = bgMusic.play();
+
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Interaction happened, audio started successfully
+                    fadeInAudio(bgMusic, 3500);
+                }).catch(e => {
+                    console.log("Music play blocked by browser:", e);
+                    // On some browsers, we might need another interaction or a fallback
+                    // But since this is inside a click event, it should generally work
+                });
+            }
         }
 
         // Change image to success GIF
