@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tick = (now) => {
             const elapsed = now - start;
             const progress = Math.min(elapsed / duration, 1);
-            audio.volume = progress * 0.2;
+            audio.volume = progress * 0.6; // Increased from 0.2 for better visibility
             if (progress < 1) {
                 requestAnimationFrame(tick);
             }
@@ -138,7 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // "Yes" button logic
+    yesBtn.addEventListener('touchstart', (e) => {
+        // Handle touch specially for mobile
+        if (!yesBtn.dataset.triggered) {
+            yesBtn.dataset.triggered = 'true';
+            yesBtn.click();
+        }
+    });
+
     yesBtn.addEventListener('click', () => {
+        yesBtn.dataset.triggered = ''; // Reset
         // Clear heartbreak effects if active
         document.body.classList.remove('ashy-mode');
         if (rainInterval) {
@@ -150,7 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- Start/Replay Music with Fade-in ---
-        if (bgMusic) {
+        const playAudio = () => {
+            if (!bgMusic) return;
+
+            console.log("Attempting to play audio...");
             bgMusic.pause();
             bgMusic.currentTime = 0;
             bgMusic.volume = 0;
@@ -160,18 +172,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    // Interaction happened, audio started successfully
+                    console.log("Audio playback started successfully!");
                     // Restore the 500ms delay for smooth transition as requested
                     setTimeout(() => {
                         fadeInAudio(bgMusic, 3500);
                     }, 500);
                 }).catch(e => {
-                    console.log("Music play blocked by browser:", e);
-                    // On some browsers, we might need another interaction or a fallback
-                    // But since this is inside a click event, it should generally work
+                    console.error("Music play blocked by browser:", e);
                 });
             }
-        }
+        };
+
+        // Attach to both click and touch for reliability
+        playAudio();
 
         // Change image to success GIF
         const mainImg = document.querySelector('.main-image');
