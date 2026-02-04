@@ -148,43 +148,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     yesBtn.addEventListener('click', () => {
         yesBtn.dataset.triggered = ''; // Reset
-        // Clear heartbreak effects if active
+
+        // 1. PRIORITIZE AUDIO (Start this first!)
+        const playAudio = () => {
+            if (!bgMusic) return;
+            console.log("Audio prioritized: Attempting to play...");
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+            bgMusic.volume = 0;
+            const playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("Audio playback started successfully!");
+                    setTimeout(() => {
+                        fadeInAudio(bgMusic, 3500);
+                    }, 500);
+                }).catch(e => console.error("Music play blocked:", e));
+            }
+        };
+        playAudio();
+
+        // 2. CLEANUP HEARTBREAK EFFECTS
         document.body.classList.remove('ashy-mode');
         if (rainInterval) {
             clearInterval(rainInterval);
             rainInterval = null;
-            // Remove all existing raindrops
+            // Immediate cleanup for better performance
             const raindrops = document.querySelectorAll('.raindrop');
             raindrops.forEach(drop => drop.remove());
         }
-
-        // --- Start/Replay Music with Fade-in ---
-        const playAudio = () => {
-            if (!bgMusic) return;
-
-            console.log("Attempting to play audio...");
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-            bgMusic.volume = 0;
-
-            // Try to play immediately
-            const playPromise = bgMusic.play();
-
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    console.log("Audio playback started successfully!");
-                    // Restore the 500ms delay for smooth transition as requested
-                    setTimeout(() => {
-                        fadeInAudio(bgMusic, 3500);
-                    }, 500);
-                }).catch(e => {
-                    console.error("Music play blocked by browser:", e);
-                });
-            }
-        };
-
-        // Attach to both click and touch for reliability
-        playAudio();
 
         // Change image to success GIF
         const mainImg = document.querySelector('.main-image');
