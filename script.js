@@ -149,33 +149,54 @@ document.addEventListener('DOMContentLoaded', () => {
     yesBtn.addEventListener('click', () => {
         yesBtn.dataset.triggered = ''; // Reset
 
-        // 1. PRIORITIZE AUDIO (Start this first!)
-        const playAudio = () => {
-            if (!bgMusic) return;
-            console.log("Audio prioritized: Attempting to play...");
+        console.log("--- Yes Clicked ---");
+
+        // 1. IMMEDIATELY STOP HEAVY ANIMATIONS
+        // This clears the main thread for audio
+        if (rainInterval) {
+            console.log("Stopping rain interval...");
+            clearInterval(rainInterval);
+            rainInterval = null;
+        }
+        document.body.classList.remove('ashy-mode');
+        // Batch remove raindrops at once
+        const raindrops = document.querySelectorAll('.raindrop');
+        if (raindrops.length > 0) {
+            console.log(`Removing ${raindrops.length} raindrops...`);
+            raindrops.forEach(drop => drop.remove());
+        }
+
+        // 2. HIGH PRIORITY AUDIO TRIGGER
+        if (bgMusic) {
+            console.log("Audio Element State:", {
+                readyState: bgMusic.readyState,
+                paused: bgMusic.paused,
+                src: bgMusic.src
+            });
+
             bgMusic.pause();
             bgMusic.currentTime = 0;
             bgMusic.volume = 0;
+
+            // Forced reset for mobile/stream issues
+            if (bgMusic.readyState === 0) {
+                console.log("Audio not ready, forcing load...");
+                bgMusic.load();
+            }
+
             const playPromise = bgMusic.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    console.log("Audio playback started successfully!");
+                    console.log("Playback success!");
                     setTimeout(() => {
                         fadeInAudio(bgMusic, 3500);
                     }, 500);
-                }).catch(e => console.error("Music play blocked:", e));
+                }).catch(e => {
+                    console.error("Playback failed!", e);
+                    // Last resort: try playing without reset
+                    bgMusic.play().catch(e2 => console.error("Final fallback failed", e2));
+                });
             }
-        };
-        playAudio();
-
-        // 2. CLEANUP HEARTBREAK EFFECTS
-        document.body.classList.remove('ashy-mode');
-        if (rainInterval) {
-            clearInterval(rainInterval);
-            rainInterval = null;
-            // Immediate cleanup for better performance
-            const raindrops = document.querySelectorAll('.raindrop');
-            raindrops.forEach(drop => drop.remove());
         }
 
         // Change image to success GIF
